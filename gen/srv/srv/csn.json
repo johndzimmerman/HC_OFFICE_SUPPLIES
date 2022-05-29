@@ -191,7 +191,6 @@
     },
     "CatalogService.Products": {
       "kind": "entity",
-      "@odata.draft.enabled": true,
       "projection": {
         "from": {
           "ref": [
