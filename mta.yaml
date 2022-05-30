@@ -41,6 +41,10 @@ modules:
       - hc340officesupplieshc450officesupplies.zip
       name: hc340officesupplieshc450officesupplies
       target-path: resources/
+    - artifacts:
+      - hc450officesupliesproducts.zip
+      name: hc450officesupliesproducts
+      target-path: resources/
 - name: project1
   type: html5
   path: app/project1
@@ -54,6 +58,16 @@ modules:
 - name: hc340officesupplieshc450officesupplies
   type: html5
   path: app/hc450_officesupplies
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: hc450officesupliesproducts
+  type: html5
+  path: app/products
   build-parameters:
     build-result: dist
     builder: custom
@@ -88,11 +102,20 @@ resources:
             ProxyType: Internet
             Type: HTTP
             URL: https://ui5.sap.com
+          - Authentication: NoAuthentication
+            HTML5.DynamicDestination: true
+            HTML5.ForwardAuthToken: true
+            Name: HC_OFFICE_SUPPLIES-srv-api
+            ProxyType: Internet
+            Type: HTTP
+            URL: ~{srv-api/srv-url}
           existing_destinations_policy: update
       version: 1.0.0
     service: destination
     service-name: HC_OFFICE_SUPPLIES-destination-service
     service-plan: lite
+  requires:
+  - name: srv-api
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true

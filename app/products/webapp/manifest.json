@@ -1,7 +1,7 @@
 {
   "_version": "1.40.0",
   "sap.app": {
-    "id": "hc340.officesupplies.hc450officesupplies",
+    "id": "hc450.officesuplies.products",
     "type": "application",
     "i18n": "i18n/i18n.properties",
     "applicationVersion": {
@@ -13,7 +13,7 @@
     "sourceTemplate": {
       "id": "@sap-ux/fiori-elements-writer:lrop",
       "version": "0.3.6",
-      "toolsId": "22488f7c-fb6c-4fc8-891e-09de3261591c"
+      "toolsId": "ea820b19-9062-41aa-9e40-6746fafb6537"
     },
     "dataSources": {
       "mainService": {
@@ -71,7 +71,7 @@
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
-          "bundleName": "hc340.officesupplies.hc450officesupplies.i18n.i18n"
+          "bundleName": "hc450.officesuplies.products.i18n.i18n"
         }
       },
       "": {
