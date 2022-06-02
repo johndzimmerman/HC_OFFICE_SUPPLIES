@@ -34,37 +34,9 @@ modules:
     build-result: resources
     requires:
     - artifacts:
-      - project1.zip
-      name: project1
-      target-path: resources/
-    - artifacts:
-      - hc340officesupplieshc450officesupplies.zip
-      name: hc340officesupplieshc450officesupplies
-      target-path: resources/
-    - artifacts:
       - hc450officesupliesproducts.zip
       name: hc450officesupliesproducts
       target-path: resources/
-- name: project1
-  type: html5
-  path: app/project1
-  build-parameters:
-    build-result: dist
-    builder: custom
-    commands:
-    - npm install
-    - npm run build:cf
-    supported-platforms: []
-- name: hc340officesupplieshc450officesupplies
-  type: html5
-  path: app/hc450_officesupplies
-  build-parameters:
-    build-result: dist
-    builder: custom
-    commands:
-    - npm install
-    - npm run build:cf
-    supported-platforms: []
 - name: hc450officesupliesproducts
   type: html5
   path: app/products
@@ -75,6 +47,34 @@ modules:
     - npm install
     - npm run build:cf
     supported-platforms: []
+# ------------------------------------------------------------      
+- name: HC_OFF_SUPPLIES-approuter
+# ------------------------------------------------------------  
+  type: nodejs
+  path: approuter
+  requires:
+    - name: HC_OFF_SUPPLIES-xsuaa
+    - name: srv-api
+      group: destinations
+      properties:
+        forwardAuthToken: true
+        strictSSL: true
+        name: srv-binding
+        url: '~{srv-url}'
+        build-parameters:
+        requires:
+               - name: HC_OFF_SUPPLIES-app
+                 artifacts:
+                   - ./*
+                 target-path: resources
+# ------------------------------------------------------------
+- name: HC_OFF_SUPPLIES-app
+# ------------------------------------------------------------  
+  type: html5
+  path: app
+  build-parameters:
+      supported-platforms: []    
+      build-result: dist
 resources:
 - name: HC_OFFICE_SUPPLIES-db
   type: com.sap.xs.hdi-container
@@ -116,6 +116,25 @@ resources:
     service-plan: lite
   requires:
   - name: srv-api
+# ------------------------------------------------------------
+- name: HC_OFF_SUPPLIES-xsuaa
+# ------------------------------------------------------------
+  type: org.cloudfoundry.managed-service
+  parameters:
+      service-plan: application
+      service: xsuaa
+      path: ./xs-security.json
+      config:
+        xsappname: 'HC_OFF_SUPPLIES-${space}'
+        role-collections:
+          - name: 'Vendor-${space}'
+            description: Read Access
+            role-template-references:
+              - $XSAPPNAME.Vendor
+          - name: 'ProcurementManager-${space}'
+            description: All Access
+            role-template-references:
+              - $XSAPPNAME.ProcurementManager      
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true
@@ -125,3 +144,4 @@ build-parameters:
     commands:
     - npm ci
     - npx -p @sap/cds-dk cds build --production
+

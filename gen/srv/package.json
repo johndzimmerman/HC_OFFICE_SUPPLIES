@@ -1,0 +1,72 @@
+{
+  "name": "HC_OFFICE_SUPPLIES",
+  "version": "1.0.0",
+  "description": "A simple CAP project.",
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@sap/cds": "^5",
+    "@sap/hana-client": "^2.12.25",
+    "@sap/hdbext": "7.6.4",
+    "@sap/xsenv": "^3.2.2",
+    "@sap/xssec": "^3.2.13",
+    "express": "^4",
+    "hdb": "^0.18.3",
+    "passport": "^0.6.0",
+    "sap-hdb-promisfied": "2.202205.1"
+  },
+  "devDependencies": {
+    "@sap/ux-specification": "^1.100.3",
+    "sqlite3": "^5.0.2"
+  },
+  "scripts": {
+    "start": "cds run",
+    "watch-project1": "cds watch --open project1/webapp/index.html?sap-ui-xx-viewCache=false",
+    "undeploy": "cf undeploy HC_OFFICE_SUPPLIES --delete-services --delete-service-keys",
+    "watch-hc450_officesupplies": "cds watch --open hc450_officesupplies/webapp/index.html?sap-ui-xx-viewCache=false"
+  },
+  "eslintConfig": {
+    "extends": "eslint:recommended",
+    "env": {
+      "es2020": true,
+      "node": true,
+      "jest": true,
+      "mocha": true
+    },
+    "globals": {
+      "SELECT": true,
+      "INSERT": true,
+      "UPDATE": true,
+      "DELETE": true,
+      "CREATE": true,
+      "DROP": true,
+      "CDL": true,
+      "CQL": true,
+      "CXL": true,
+      "cds": true
+    },
+    "rules": {
+      "no-console": "off",
+      "require-atomic-updates": "off"
+    }
+  },
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "hana"
+      }
+    },
+    "hana": {
+      "deploy-format": "hdbtable"
+    }
+  },
+  "sapux": [
+    "app/project1",
+    "app/hc450_officesupplies",
+    "app/products"
+  ],
+  "engines": {
+    "node": ">=12.18"
+  }
+}

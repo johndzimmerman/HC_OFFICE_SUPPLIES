@@ -18,7 +18,7 @@ COLUMN TABLE CatalogService_Products_drafts (
   PRIMARY KEY(ID)
 ) WITH ASSOCIATIONS (
   MANY TO ONE JOIN CatalogService_Currencies AS currency ON (currency.code = currency_code),
-  MANY TO ONE JOIN CatalogService_Suppliers AS supplier ON (supplier.ID = supplier_ID),
+  MANY TO ONE JOIN CatalogService_Suppliers_drafts AS supplier ON (supplier.ID = supplier_ID),
   MANY TO MANY JOIN CatalogService_Products_texts AS texts ON (texts.ID = ID),
   MANY TO ONE JOIN CatalogService_Products_texts AS localized ON (localized.ID = ID AND localized.locale = SESSION_CONTEXT('LOCALE')),
   MANY TO ONE JOIN CatalogService_DraftAdministrativeData AS DraftAdministrativeData ON (DraftAdministrativeData.DraftUUID = DraftAdministrativeData_DraftUUID)

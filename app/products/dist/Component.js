@@ -1,0 +1,1 @@
+sap.ui.define(["sap/fe/core/AppComponent"],function(e){"use strict";return e.extend("hc450.officesuplies.products.Component",{metadata:{manifest:"json"}})});
