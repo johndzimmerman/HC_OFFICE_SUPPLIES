@@ -1,126 +1,81 @@
-_schema-version: "3.1"
-ID: HC_OFFICE_SUPPLIES
+_schema-version: '3.1'
+ID: HC_OFF_SUPPLIES
+version: 3.0.1
 description: A simple CAP project.
-version: 1.0.0
+parameters:
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm install --production
+        - npx -p @sap/cds-dk cds build --production
 modules:
-- name: HC_OFFICE_SUPPLIES-srv
-  type: nodejs
-  path: gen/srv
-  requires:
-  - name: HC_OFFICE_SUPPLIES-db
-  provides:
-  - name: srv-api
-    properties:
-      srv-url: ${default-url}
-  parameters:
-    buildpack: nodejs_buildpack
-  build-parameters:
-    builder: npm-ci
-- name: HC_OFFICE_SUPPLIES-db-deployer
-  type: hdb
-  path: gen/db
-  requires:
-  - name: HC_OFFICE_SUPPLIES-db
-  parameters:
-    buildpack: nodejs_buildpack
-- name: HC_OFFICE_SUPPLIES-app-content
-  type: com.sap.application.content
-  path: .
-  requires:
-  - name: HC_OFFICE_SUPPLIES-repo-host
-    parameters:
-      content-target: true
-  build-parameters:
-    build-result: resources
+# --------------------- SERVER MODULE ------------------------
+  - name: HC_OFF_SUPPLIES-srv
+# ------------------------------------------------------------  
+    type: nodejs
+    path: gen/srv
     requires:
-    - artifacts:
-      - hc450officesupliesproducts.zip
-      name: hc450officesupliesproducts
-      target-path: resources/
-- name: hc450officesupliesproducts
-  type: html5
-  path: app/products
-  build-parameters:
-    build-result: dist
-    builder: custom
-    commands:
-    - npm install
-    - npm run build:cf
-    supported-platforms: []
+      - name: HC_OFF_SUPPLIES-db
+      - name: HC_OFF_SUPPLIES-xsuaa
+      - name: HC_OFF_SUPPLIES-destination
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: '${default-url}'
+ # --------------------- SIDECAR MODULE ------------------------         
+  - name: HC_OFF_SUPPLIES-db-deployer
+ # ------------------------------------------------------------   
+    type: hdb
+    path: gen/db
+    parameters:
+      buildpack: nodejs_buildpack
+    requires:
+      - name: HC_OFF_SUPPLIES-db
+      - name: HC_OFF_SUPPLIES-xsuaa
 # ------------------------------------------------------------      
-- name: HC_OFF_SUPPLIES-approuter
+  - name: HC_OFF_SUPPLIES-approuter
 # ------------------------------------------------------------  
-  type: nodejs
-  path: approuter
-  requires:
-    - name: HC_OFF_SUPPLIES-xsuaa
-    - name: srv-api
-      group: destinations
-      properties:
-        forwardAuthToken: true
-        strictSSL: true
-        name: srv-binding
-        url: '~{srv-url}'
-        build-parameters:
-        requires:
-               - name: HC_OFF_SUPPLIES-app
-                 artifacts:
-                   - ./*
-                 target-path: resources
+    type: nodejs
+    path: approuter
+    requires:
+      - name: HC_OFF_SUPPLIES-xsuaa
+      - name: srv-api
+        group: destinations
+        properties:
+          forwardAuthToken: true
+          strictSSL: true
+          name: srv-binding
+          url: '~{srv-url}'
+    build-parameters:
+          requires:
+            - name: HC_OFF_SUPPLIES-app
+              artifacts:
+                - ./*
+              target-path: resources
 # ------------------------------------------------------------
-- name: HC_OFF_SUPPLIES-app
+  - name: HC_OFF_SUPPLIES-app
 # ------------------------------------------------------------  
-  type: html5
-  path: app
-  build-parameters:
-      supported-platforms: []    
-      build-result: dist
+    type: html5
+    path: app
+    build-parameters:
+      supported-platforms: []
 resources:
-- name: HC_OFFICE_SUPPLIES-db
-  type: com.sap.xs.hdi-container
-  parameters:
-    service: hanatrial
-    service-plan: hdi-shared
-  properties:
-    hdi-service-name: jdzshcinstance
-- name: HC_OFFICE_SUPPLIES-repo-host
-  type: org.cloudfoundry.managed-service
-  parameters:
-    service: html5-apps-repo
-    service-name: HC_OFFICE_SUPPLIES-html5-srv
-    service-plan: app-host
-- name: HC_OFFICE_SUPPLIES-destination-service
-  type: org.cloudfoundry.managed-service
-  parameters:
-    config:
-      HTML5Runtime_enabled: false
-      init_data:
-        instance:
-          destinations:
-          - Authentication: NoAuthentication
-            Name: ui5
-            ProxyType: Internet
-            Type: HTTP
-            URL: https://ui5.sap.com
-          - Authentication: NoAuthentication
-            HTML5.DynamicDestination: true
-            HTML5.ForwardAuthToken: true
-            Name: HC_OFFICE_SUPPLIES-srv-api
-            ProxyType: Internet
-            Type: HTTP
-            URL: ~{srv-api/srv-url}
-          existing_destinations_policy: update
-      version: 1.0.0
-    service: destination
-    service-name: HC_OFFICE_SUPPLIES-destination-service
-    service-plan: lite
-  requires:
-  - name: srv-api
 # ------------------------------------------------------------
-- name: HC_OFF_SUPPLIES-xsuaa
+  - name: HC_OFF_SUPPLIES-db
+# ------------------------------------------------------------  
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+    properties:
+      hdi-service-name: '${service-name}'
 # ------------------------------------------------------------
-  type: org.cloudfoundry.managed-service
-  parameters:
+  - name: HC_OFF_SUPPLIES-xsuaa
+# ------------------------------------------------------------
+    type: org.cloudfoundry.managed-service
+    parameters:
       service-plan: application
       service: xsuaa
       path: ./xs-security.json
@@ -134,14 +89,11 @@ resources:
           - name: 'ProcurementManager-${space}'
             description: All Access
             role-template-references:
-              - $XSAPPNAME.ProcurementManager      
-parameters:
-  deploy_mode: html5-repo
-  enable-parallel-deployments: true
-build-parameters:
-  before-all:
-  - builder: custom
-    commands:
-    - npm ci
-    - npx -p @sap/cds-dk cds build --production
-
+              - $XSAPPNAME.ProcurementManager
+# ------------------------------------------------------------  
+  - name: HC_OFF_SUPPLIES-destination
+# ------------------------------------------------------------  
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
